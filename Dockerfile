@@ -1,5 +1,5 @@
 # Utiliza a imagem oficial do Node.js versão 24 (baseada na distribuição leve Alpine)
-FROM node:24-alpine
+FROM node:18-alpine
 
 # Define o diretório de trabalho padrão dentro do container
 WORKDIR /app

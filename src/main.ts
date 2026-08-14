@@ -45,6 +45,8 @@ async function bootstrap() {
   );
   const config = app.get(ConfigService);
 
+  app.setGlobalPrefix('api');
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Modelo Back-End')
     .setDescription('Modelo Back-End')
@@ -54,7 +56,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const HTTP_PORT = config.get<string>('HTTP_PORT');
   const APP_NAME = config.get<string>('APP_NAME');

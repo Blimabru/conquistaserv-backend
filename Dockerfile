@@ -1,6 +1,9 @@
 # Utiliza a imagem oficial do Node.js versão 24 (baseada na distribuição leve Alpine)
 FROM node:18-alpine
 
+# Instala ferramentas C++ (python, make, g++) necessárias para compilar pacotes como o bcrypt
+RUN apk add --no-cache python3 make g++
+
 # Define o diretório de trabalho padrão dentro do container
 WORKDIR /app
 

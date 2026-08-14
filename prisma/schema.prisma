@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  moduleFormat = "cjs"
+  
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id           String       @id @default(uuid())
+  nome         String
+  email        String       @unique
+  nivel        String
+  situacao     String
+  login        String       @unique
+  senha        String
+  refreshToken String?
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime?
+  RequestLog   RequestLog[]
+
+  @@map("usuarios") 
+}
+
+model RequestLog {
+  id        String   @id @default(uuid())
+  timestamp DateTime @default(now()) @db.Timestamptz(3)
+
+  userId    String?
+  user      Usuario? @relation(fields: [userId], references: [id])
+  ipAddress String?
+
+  method     String
+  path       String
+  statusCode Int
+  latency    Int
+  body       Json?  @db.JsonB
+
+  serviceName String?
+  actionName  String?
+  userAgent   String?
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([path])
+}

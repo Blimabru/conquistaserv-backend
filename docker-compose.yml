@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  modelo-api:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME
+      - HTTP_PORT
+      - DATABASE_URL
+      - ACCESS_TOKEN_SECRET
+      - ACCESS_TOKEN_EXPIRATION
+      - REFRESH_TOKEN_SECRET
+      - REFRESH_TOKEN_EXPIRATION
+    volumes:
+      - ../../ssl:/app/ssl
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    command: npm run start
+    networks:
+      - srvweb-network
+
+networks:
+  srvweb-network:
+    driver: bridge

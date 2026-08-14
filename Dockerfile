@@ -1,8 +1,6 @@
-# Utiliza a imagem oficial do Node.js versão 24 (baseada na distribuição leve Alpine)
-FROM node:18-alpine
-
-# Instala ferramentas C++ (python, make, g++) necessárias para compilar pacotes como o bcrypt
-RUN apk add --no-cache python3 make g++
+# Utiliza a imagem oficial do Node.js versão 20 (Debian)
+# Usar Debian em vez de Alpine resolve os crashs do QEMU ao buscar binários ARM64 prontos (ex: bcrypt, prisma)
+FROM node:20
 
 # Define o diretório de trabalho padrão dentro do container
 WORKDIR /app

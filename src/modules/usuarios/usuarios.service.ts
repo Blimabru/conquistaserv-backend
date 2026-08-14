@@ -8,7 +8,7 @@ import { PrismaService } from '../../plugins/database/services/prisma.service';
 import { PaginateService } from 'src/shared/services/paginate.service';
 import { AtualizaUsuarioDto } from './dto/atualiza-usuario.dto';
 import { CriaUsuarioDto } from './dto/cria-usuario.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { equals } from 'class-validator';
 
 @Injectable()

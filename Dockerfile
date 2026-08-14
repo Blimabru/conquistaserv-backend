@@ -1,37 +1,21 @@
-# Utiliza a imagem oficial do Node.js versão 20 (Debian)
-# Usar Debian em vez de Alpine resolve os crashs do QEMU ao buscar binários ARM64 prontos (ex: bcrypt, prisma)
-FROM node:20
-
-# Define o diretório de trabalho padrão dentro do container
+# ESTÁGIO 1: Build Nativo (Bypass no QEMU)
+FROM --platform=linux/amd64 node:20 AS build-stage
 WORKDIR /app
-
-# Copia todos os arquivos do projeto local para dentro do diretório /app do container
 COPY . .
-
-# Instala o gerenciador de processos PM2 globalmente para manter a aplicação rodando em produção
-RUN npm i -g pm2
-
-# Instala a interface de linha de comando do NestJS para permitir o build do projeto
-RUN npm i -g @nestjs/cli
-
-# Instala as dependências do projeto definidas no package.json
 RUN npm i
-
-# Gera o client do Prisma (necessário para o ORM se comunicar com o banco de dados)
 RUN npx prisma generate
-
-# Compila o código TypeScript para JavaScript na pasta 'dist'
 RUN npm run build
 
-# Remove o TypeScript para economizar espaço e deixar a imagem mais leve, já que não é mais necessário em produção
-RUN npm uninstall typescript
+# ESTÁGIO 2: Imagem ARM64 Final
+FROM node:20
+WORKDIR /app
+COPY --from=build-stage /app/node_modules ./node_modules
+COPY --from=build-stage /app/dist ./dist
+COPY --from=build-stage /app/package*.json ./
+COPY --from=build-stage /app/prisma ./prisma
+COPY --from=build-stage /app/entrypoint.sh ./
 
-# Dá permissão de execução ao script de inicialização
+RUN npm i -g pm2 @nestjs/cli
 RUN chmod +x entrypoint.sh
-
-# Informa ao Docker que a aplicação escuta na porta 3006
 EXPOSE 3006
-
-# Define o comando que será executado quando o container for iniciado no servidor.
-# Usamos o entrypoint.sh para rodar as migrações do banco ANTES de iniciar a aplicação.
 CMD ["./entrypoint.sh"]

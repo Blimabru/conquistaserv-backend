@@ -1,4 +1,4 @@
-﻿# ConquistaServ — Back-End
+# ConquistaServ — Back-End
 
 API REST do sistema **ConquistaServ**, desenvolvida com [NestJS](https://nestjs.com/) e [Prisma ORM](https://www.prisma.io/), utilizando PostgreSQL como banco de dados relacional.
 
@@ -126,13 +126,13 @@ O pipeline é gerenciado pelo **GitHub Actions** e executa automaticamente a cad
 ### Fluxo de execução
 
 1. **Checkout** do repositório
-2. **Configuração do Node.js 22** via `actions/setup-node@v4`
+2. **Configuração do Node.js 22** com cache de dependências (`cache: 'npm'`)
 3. **Instalação das dependências** com `npm install`
 4. **Geração dos tipos do Prisma Client** com `npx prisma generate`
 5. **Build da aplicação** com `npm run build`
 6. **Login no GitHub Container Registry (GHCR)**
 7. **Build e push da imagem Docker** para `ghcr.io` (plataforma `linux/arm64`)
-8. **Deploy na VM Oracle** via SSH
+8. **Deploy na VM Oracle** via SSH (escreve o compose e inicia a stack com `docker compose up -d`)
 
 ### Secrets necessários no repositório GitHub
 
@@ -141,6 +141,8 @@ O pipeline é gerenciado pelo **GitHub Actions** e executa automaticamente a cad
 | `ORACLE_HOST` | Endereço IP ou hostname da VM Oracle |
 | `ORACLE_USERNAME` | Usuário SSH da VM Oracle |
 | `ORACLE_SSH_KEY` | Chave privada SSH (formato PEM) |
+| `PROD_DATABASE_URL` | String de conexão para o PostgreSQL de produção |
+| `PROD_JWT_SECRET` | Chave secreta de produção para assinatura e validação dos tokens JWT |
 
 > O secret `GITHUB_TOKEN` é provido automaticamente pelo GitHub Actions e não requer configuração manual.
 
@@ -162,10 +164,14 @@ Este aviso refere-se ao **runtime interno** das actions do GitHub, não à vers�
 A documentação Swagger da API está disponível em tempo de execução no seguinte endereço:
 
 ```
-http://localhost:<PORT>/api
+# Em desenvolvimento local:
+http://localhost:<PORT>/docs
+
+# Em produção:
+https://<APP_HOSTNAME>/api/docs/
 ```
 
-A porta padrão é definida pela variável de ambiente `PORT` no arquivo `.env`.
+A porta padrão local é definida pela variável de ambiente `HTTP_PORT` no arquivo `.env`.
 
 ---
 

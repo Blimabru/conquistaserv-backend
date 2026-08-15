@@ -83,9 +83,9 @@ jobs:
             mkdir -p /srv/stacks/conquistaserv
             cd /srv/stacks/conquistaserv
             
-            echo "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}" > .env
-            echo "ACCESS_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}" >> .env
-            echo "REFRESH_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}" >> .env
+            echo 'DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}' > .env
+            echo 'ACCESS_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}' >> .env
+            echo 'REFRESH_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}' >> .env
             
             echo 'name: conquistaserv
             services:

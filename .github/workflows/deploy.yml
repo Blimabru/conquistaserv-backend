@@ -89,9 +89,13 @@ jobs:
               -e TZ=America/Bahia \
               -e NODE_ENV=production \
               -e DATABASE_URL="postgresql://user_conquistaserv:ConquistaServDB97987989799*@postgres:5432/conquistaserv?schema=conquistaserv" \
-              -e JWT_SECRET="3PT82qfufWNZgFpLiRtTBqdBB2JJIEt/YKec/AowZSo=" \
-              -e JWT_EXPIRE="86400s" \
+              -e ACCESS_TOKEN_SECRET="3PT82qfufWNZgFpLiRtTBqdBB2JJIEt/YKec/AowZSo=" \
+              -e ACCESS_TOKEN_EXPIRATION="86400s" \
+              -e REFRESH_TOKEN_SECRET="3PT82qfufWNZgFpLiRtTBqdBB2JJIEt/YKec/AowZSo=" \
+              -e REFRESH_TOKEN_EXPIRATION="604800s" \
+              -e HTTP_PORT=3006 \
               -e APP_HOSTNAME="conquistaserv.brainstormlabs.online" \
+              -e APP_NAME="conquistaserv-backend" \
               --network global-network \
               --log-driver json-file \
               --log-opt max-size=10m \

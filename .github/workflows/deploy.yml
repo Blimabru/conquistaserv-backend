@@ -74,33 +74,43 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/blimabru/conquistaserv-backend:main
             
-            CONTAINER_ID=$(docker ps -q -f name=conquistaserv_backend)
-            if [ ! -z "$CONTAINER_ID" ]; then
-              docker stop $CONTAINER_ID
-              docker rm $CONTAINER_ID
-            fi
+            mkdir -p /srv/stacks/conquistaserv-backend
+            cd /srv/stacks/conquistaserv-backend
             
-            docker run -d \
-              --name conquistaserv_backend \
-              --restart unless-stopped \
-              -v /etc/localtime:/etc/localtime:ro \
-              -v /etc/timezone:/etc/timezone:ro \
-              -e TZ=America/Bahia \
-              -e NODE_ENV=production \
-              -e DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}" \
-              -e ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}" \
-              -e ACCESS_TOKEN_EXPIRATION="86400s" \
-              -e REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}" \
-              -e REFRESH_TOKEN_EXPIRATION="604800s" \
-              -e HTTP_PORT=3006 \
-              -e APP_HOSTNAME="conquistaserv.brainstormlabs.online" \
-              -e APP_NAME="conquistaserv-backend" \
-              --network global-network \
-              --log-driver json-file \
-              --log-opt max-size=10m \
-              --log-opt max-file=3 \
-              ghcr.io/blimabru/conquistaserv-backend:main
-              
+            cat << 'EOF' > docker-compose.yml
+version: '3.8'
+services:
+  backend:
+    image: ghcr.io/blimabru/conquistaserv-backend:main
+    container_name: conquistaserv_backend
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TZ=America/Bahia
+      - NODE_ENV=production
+      - DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
+      - ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+      - ACCESS_TOKEN_EXPIRATION=86400s
+      - REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+      - REFRESH_TOKEN_EXPIRATION=604800s
+      - HTTP_PORT=3006
+      - APP_HOSTNAME=conquistaserv.brainstormlabs.online
+      - APP_NAME=conquistaserv-backend
+    networks:
+      - global-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  global-network:
+    external: true
+EOF
+            
+            docker compose pull
+            docker compose up -d --remove-orphans
             docker image prune -af

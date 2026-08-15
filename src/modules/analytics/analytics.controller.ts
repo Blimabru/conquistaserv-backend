@@ -1,10 +1,11 @@
 import { QueryAnalyticsDto } from './dto/query-analytics.dto';
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
-import { Public } from 'src/common/decorators';
+import { NivelMinimo } from 'src/common/decorators';
 
-@Public()
+@ApiBearerAuth()
+@NivelMinimo('ADMIN')
 @ApiTags('Analytics')
 @Controller('analytics')
 export class AnalyticsController {

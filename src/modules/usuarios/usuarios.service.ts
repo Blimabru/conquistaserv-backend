@@ -156,7 +156,7 @@ export class UsuariosService {
 
   private async _usuarioExiste(
     data: CriaUsuarioDto | AtualizaUsuarioDto,
-  ): Promise<CriaUsuarioDto> {
+  ): Promise<void> {
     const usuario = await this.prismaService.usuario.findFirst({
       where: {
         login: data.login,
@@ -168,13 +168,11 @@ export class UsuariosService {
         'Esse login de usuário já existe na base de dados',
       );
     }
-
-    return usuario;
   }
 
   private async _emailExiste(
     data: CriaUsuarioDto | AtualizaUsuarioDto,
-  ): Promise<CriaUsuarioDto> {
+  ): Promise<void> {
     const emailExiste = await this.prismaService.usuario.findFirst({
       where: {
         email: data.email,
@@ -184,7 +182,5 @@ export class UsuariosService {
     if (emailExiste) {
       throw new ConflictException('Esse e-mail já existe na base de dados');
     }
-
-    return emailExiste;
   }
 }

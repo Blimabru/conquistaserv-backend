@@ -20,10 +20,12 @@ import { LocalRequest, RefreshTokenRequest } from 'src/common/interfaces';
 import { LogoutResponseDto } from './dto/autentica-usuario-response.dto';
 import { LocalAuthGuard, RefreshTokenGuard } from 'src/common/guards';
 import { AutenticaUsuarioDto } from './dto/autentica-usuario.dto';
+import { parseExpirationToMs } from 'src/common/utils';
 import { Public } from 'src/common/decorators';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import * as Express from 'express';
-import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 
 @Public()
 @Controller('auth')
@@ -32,7 +34,14 @@ export class AuthController {
   constructor(
     private readonly logger: Logger,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
+
+  private _refreshTokenCookieMaxAge(): number {
+    return parseExpirationToMs(
+      this.configService.get<string>('REFRESH_TOKEN_EXPIRATION'),
+    );
+  }
 
   @ApiCreatedResponse({
     description: 'Conta conectada com sucesso!',
@@ -55,6 +64,7 @@ export class AuthController {
     description:
       'Realiza o login de um usuário com base nas credenciais passadas no corpo da requisição e retorna os tokens de acesso e refresh...',
   })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -67,7 +77,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 365 * 24 * 60 * 60 * 1000,
+      maxAge: this._refreshTokenCookieMaxAge(),
     });
 
     this.logger.debug(`Usuario ${req.user.login} logado!`, {
@@ -109,7 +119,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 365 * 24 * 60 * 60 * 1000,
+      maxAge: this._refreshTokenCookieMaxAge(),
     });
 
     return {

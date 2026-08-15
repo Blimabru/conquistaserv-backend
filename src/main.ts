@@ -35,8 +35,16 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   const loggingService = new LoggingService(prismaService);
 
+  const frontendUrls = (process.env.FRONTEND_URLS ?? 'http://localhost:3000')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean);
+
   app.use(cookieParser());
-  app.enableCors();
+  app.enableCors({
+    origin: frontendUrls,
+    credentials: true,
+  });
   app.useGlobalInterceptors(new LoggingInterceptor(loggingService));
   app.useGlobalPipes(
     new ValidationPipe({

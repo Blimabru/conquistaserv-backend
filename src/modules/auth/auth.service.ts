@@ -35,7 +35,7 @@ export class AuthService {
     const { accessToken, refreshToken: newRefreshToken } =
       await this._buscaTokens(usuario);
 
-    await this._atualizaRefreshToken(usuario.id, refreshToken);
+    await this._atualizaRefreshToken(usuario.id, newRefreshToken);
 
     return {
       accessToken,

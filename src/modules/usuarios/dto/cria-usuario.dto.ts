@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsIn } from 'class-validator';
+import { NIVEIS_VALIDOS, NivelAcesso } from 'src/common/constants';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CriaUsuarioDto {
@@ -11,10 +12,11 @@ export class CriaUsuarioDto {
   @ApiProperty()
   readonly email: string;
 
-  @IsString({ message: 'O nível tem que ser uma String' })
-  @IsNotEmpty({ message: 'Faltou informar o nível do usuário' })
-  @ApiProperty()
-  readonly nivel: string;
+  @IsIn(NIVEIS_VALIDOS, {
+    message: `O nível deve ser um dos seguintes: ${NIVEIS_VALIDOS.join(', ')}`,
+  })
+  @ApiProperty({ enum: NIVEIS_VALIDOS })
+  readonly nivel: NivelAcesso;
 
   @IsString({ message: 'A situação tem que ser uma String' })
   @IsNotEmpty({ message: 'Faltou informar a situação do usuário' })

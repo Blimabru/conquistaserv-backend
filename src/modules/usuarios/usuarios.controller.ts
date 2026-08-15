@@ -1,6 +1,5 @@
 import {
   Controller,
-  UseGuards,
   Delete,
   Param,
   Patch,
@@ -8,6 +7,7 @@ import {
   Body,
   Post,
   Get,
+  Request,
 } from '@nestjs/common';
 import {
   ApiCreateOperation,
@@ -20,16 +20,17 @@ import { AtualizaUsuarioDto } from './dto/atualiza-usuario.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CriaUsuarioDto } from './dto/cria-usuario.dto';
 import { UsuariosService } from './usuarios.service';
-import { AuthGuard } from '@nestjs/passport';
+import { NivelMinimo } from 'src/common/decorators';
+import { AccessTokenRequest } from 'src/common/interfaces';
 
 @ApiBearerAuth()
+@NivelMinimo('ADMIN')
 @Controller('usuarios')
 @ApiTags('Usuários')
 export class UsuariosController {
   constructor(private readonly usuarioService: UsuariosService) {}
 
   @Get()
-  @UseGuards(AuthGuard())
   @ApiSearchOperation({
     summary: 'Busca usuários',
     description:
@@ -47,8 +48,20 @@ export class UsuariosController {
     );
   }
 
+  @Get('/me')
+  @NivelMinimo('USUARIO')
+  @ApiSearchOperation({
+    summary: 'Busca o usuário autenticado',
+    description:
+      'Retorna os dados do usuário dono do token de acesso informado, sem exigir nível de administrador...',
+  })
+  async buscaUsuarioAutenticado(
+    @Request() req: AccessTokenRequest,
+  ): Promise<any> {
+    return this.usuarioService.buscaPorId(req.user.sub);
+  }
+
   @Get('/:id')
-  @UseGuards(AuthGuard())
   @ApiSearchOperation({
     summary: 'Busca um usuário',
     description:
@@ -59,7 +72,6 @@ export class UsuariosController {
   }
 
   @Post()
-  @UseGuards(AuthGuard())
   @ApiCreateOperation({
     summary: 'Cria um usuário',
     description:
@@ -70,7 +82,6 @@ export class UsuariosController {
   }
 
   @Patch('/:id')
-  @UseGuards(AuthGuard())
   @ApiUpdateOperation({
     summary: 'Atualiza um usuário',
     description:
@@ -81,7 +92,6 @@ export class UsuariosController {
   }
 
   @Delete('/:id')
-  @UseGuards(AuthGuard())
   @ApiDeleteOperation({
     summary: 'Exclui um usuário',
     description: 'Exclui um usuário com base no ID passado como parâmetro...',

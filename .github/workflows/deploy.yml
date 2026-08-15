@@ -75,11 +75,15 @@ jobs:
           script: |
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            mkdir -p /srv/stacks/conquistaserv/backend
-            cd /srv/stacks/conquistaserv/backend
+            mkdir -p /srv/stacks/conquistaserv
+            cd /srv/stacks/conquistaserv
+            
+            echo "DATABASE_URL=\"${{ secrets.PROD_DATABASE_URL }}\"" > .env
+            echo "ACCESS_TOKEN_SECRET=\"${{ secrets.PROD_JWT_SECRET }}\"" >> .env
+            echo "REFRESH_TOKEN_SECRET=\"${{ secrets.PROD_JWT_SECRET }}\"" >> .env
             
             echo 'version: "3.8"
-            name: conquistaserv-backend
+            name: conquistaserv
             services:
               backend:
                 image: ghcr.io/blimabru/conquistaserv-backend:main
@@ -91,10 +95,10 @@ jobs:
                 environment:
                   - TZ=America/Bahia
                   - NODE_ENV=production
-                  - DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
-                  - ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+                  - DATABASE_URL=${DATABASE_URL}
+                  - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
                   - ACCESS_TOKEN_EXPIRATION=86400s
-                  - REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+                  - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
                   - REFRESH_TOKEN_EXPIRATION=604800s
                   - HTTP_PORT=3006
                   - APP_HOSTNAME=conquistaserv.brainstormlabs.online
@@ -106,10 +110,28 @@ jobs:
                   options:
                     max-size: "10m"
                     max-file: "3"
+
+              frontend:
+                image: ghcr.io/blimabru/conquistaserv-frontend:main
+                container_name: conquistaserv_frontend
+                restart: unless-stopped
+                volumes:
+                  - /etc/localtime:/etc/localtime:ro
+                  - /etc/timezone:/etc/timezone:ro
+                environment:
+                  - TZ=America/Bahia
+                networks:
+                  - global-network
+                logging:
+                  driver: "json-file"
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+
             networks:
               global-network:
                 external: true' | sed 's/^            //' > docker-compose.yml
             
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose pull backend
+            docker compose up -d backend
             docker image prune -af

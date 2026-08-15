@@ -1,4 +1,4 @@
-name: Deploy Backend to Oracle VM
+﻿name: Deploy Backend to Oracle VM
 
 on:
   push:
@@ -23,11 +23,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Dependencies and Build (Native AMD64)
         run: |
-          npm ci || npm install
+          npm install
           npx prisma generate
           npm run build
 
@@ -69,13 +69,13 @@ jobs:
           username: ${{ secrets.ORACLE_USERNAME }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
-            # Autenticação no GHCR
+            # Autenticacao no GHCR
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # Download da nova imagem
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
             
-            # Solicitação de recriação do container sem afetar a integridade da stack no Portainer
+            # Solicitacao de recriacao do container sem afetar a integridade da stack no Portainer
             # Captura do ID do container atual
             CONTAINER_ID=$(docker ps -q -f name=conquistaserv_backend)
             if [ ! -z "$CONTAINER_ID" ]; then
@@ -83,10 +83,10 @@ jobs:
               docker rm $CONTAINER_ID
             fi
             
-            # NOTA: O método corporativo recomendado consiste em habilitar o "Webhook" da Stack no Portainer
-            # e realizar uma requisição via curl neste ponto. Na ausência desta configuração, a 
-            # atualização deve ser finalizada via opção "Pull and redeploy" na interface do Portainer, 
-            # ou mediante a configuração posterior do Webhook.
+            # NOTA: O metodo corporativo recomendado consiste em habilitar o "Webhook" da Stack no Portainer
+            # e realizar uma requisicao via curl neste ponto. Na ausencia desta configuracao, a 
+            # atualizacao deve ser finalizada via opcao "Pull and redeploy" na interface do Portainer, 
+            # ou mediante a configuracao posterior do Webhook.
             
-            # Remoção de imagens obsoletas
+            # Remocao de imagens obsoletas
             docker image prune -af

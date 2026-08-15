@@ -79,6 +79,7 @@ jobs:
             cd /srv/stacks/conquistaserv/backend
             
             echo 'version: "3.8"
+            name: conquistaserv-backend
             services:
               backend:
                 image: ghcr.io/blimabru/conquistaserv-backend:main

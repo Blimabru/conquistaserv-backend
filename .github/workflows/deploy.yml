@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install Dependencies and Build (Native AMD64)
         env:
@@ -88,10 +89,10 @@ jobs:
               -v /etc/timezone:/etc/timezone:ro \
               -e TZ=America/Bahia \
               -e NODE_ENV=production \
-              -e DATABASE_URL="postgresql://user_conquistaserv:ConquistaServDB97987989799*@postgres:5432/conquistaserv?schema=conquistaserv" \
-              -e ACCESS_TOKEN_SECRET="3PT82qfufWNZgFpLiRtTBqdBB2JJIEt/YKec/AowZSo=" \
+              -e DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}" \
+              -e ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}" \
               -e ACCESS_TOKEN_EXPIRATION="86400s" \
-              -e REFRESH_TOKEN_SECRET="3PT82qfufWNZgFpLiRtTBqdBB2JJIEt/YKec/AowZSo=" \
+              -e REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}" \
               -e REFRESH_TOKEN_EXPIRATION="604800s" \
               -e HTTP_PORT=3006 \
               -e APP_HOSTNAME="conquistaserv.brainstormlabs.online" \

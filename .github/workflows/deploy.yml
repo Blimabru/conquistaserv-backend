@@ -78,38 +78,36 @@ jobs:
             mkdir -p /srv/stacks/conquistaserv/backend
             cd /srv/stacks/conquistaserv/backend
             
-            cat << 'EOF' > docker-compose.yml
-version: '3.8'
-services:
-  backend:
-    image: ghcr.io/blimabru/conquistaserv-backend:main
-    container_name: conquistaserv_backend
-    restart: unless-stopped
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - TZ=America/Bahia
-      - NODE_ENV=production
-      - DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
-      - ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
-      - ACCESS_TOKEN_EXPIRATION=86400s
-      - REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
-      - REFRESH_TOKEN_EXPIRATION=604800s
-      - HTTP_PORT=3006
-      - APP_HOSTNAME=conquistaserv.brainstormlabs.online
-      - APP_NAME=conquistaserv-backend
-    networks:
-      - global-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-networks:
-  global-network:
-    external: true
-EOF
+            echo 'version: "3.8"
+            services:
+              backend:
+                image: ghcr.io/blimabru/conquistaserv-backend:main
+                container_name: conquistaserv_backend
+                restart: unless-stopped
+                volumes:
+                  - /etc/localtime:/etc/localtime:ro
+                  - /etc/timezone:/etc/timezone:ro
+                environment:
+                  - TZ=America/Bahia
+                  - NODE_ENV=production
+                  - DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
+                  - ACCESS_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+                  - ACCESS_TOKEN_EXPIRATION=86400s
+                  - REFRESH_TOKEN_SECRET="${{ secrets.PROD_JWT_SECRET }}"
+                  - REFRESH_TOKEN_EXPIRATION=604800s
+                  - HTTP_PORT=3006
+                  - APP_HOSTNAME=conquistaserv.brainstormlabs.online
+                  - APP_NAME=conquistaserv-backend
+                networks:
+                  - global-network
+                logging:
+                  driver: "json-file"
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+            networks:
+              global-network:
+                external: true' | sed 's/^            //' > docker-compose.yml
             
             docker compose pull
             docker compose up -d --remove-orphans

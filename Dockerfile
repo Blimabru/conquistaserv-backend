@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:22
 WORKDIR /app
 
 # Copia os arquivos que JÁ FORAM construídos nativamente pelo Github Actions

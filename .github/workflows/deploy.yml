@@ -73,7 +73,7 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+            docker pull ghcr.io/blimabru/conquistaserv-backend:main
             
             CONTAINER_ID=$(docker ps -q -f name=conquistaserv_backend)
             if [ ! -z "$CONTAINER_ID" ]; then
@@ -96,6 +96,6 @@ jobs:
               --log-driver json-file \
               --log-opt max-size=10m \
               --log-opt max-file=3 \
-              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+              ghcr.io/blimabru/conquistaserv-backend:main
               
             docker image prune -af

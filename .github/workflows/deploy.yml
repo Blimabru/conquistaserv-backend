@@ -74,17 +74,17 @@ jobs:
           username: ${{ secrets.ORACLE_USERNAME }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            mkdir -p /srv/stacks/conquistaserv
+            sudo mkdir -p /srv/stacks/conquistaserv
+            sudo chown -R $USER:$USER /srv/stacks/conquistaserv
             cd /srv/stacks/conquistaserv
             
             echo "DATABASE_URL=\"${{ secrets.PROD_DATABASE_URL }}\"" > .env
             echo "ACCESS_TOKEN_SECRET=\"${{ secrets.PROD_JWT_SECRET }}\"" >> .env
             echo "REFRESH_TOKEN_SECRET=\"${{ secrets.PROD_JWT_SECRET }}\"" >> .env
             
-            echo 'version: "3.8"
-            name: conquistaserv
+            echo 'name: conquistaserv
             services:
               backend:
                 image: ghcr.io/blimabru/conquistaserv-backend:main
@@ -133,6 +133,6 @@ jobs:
               global-network:
                 external: true' | sed 's/^            //' > docker-compose.yml
             
-            docker compose pull backend
-            docker compose up -d backend
-            docker image prune -af
+            sudo docker compose pull backend
+            sudo docker compose up -d backend
+            sudo docker image prune -af

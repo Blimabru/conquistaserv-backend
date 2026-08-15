@@ -4,6 +4,7 @@ WORKDIR /app
 # Copia os arquivos que JÁ FORAM construídos nativamente pelo Github Actions
 COPY package*.json ./
 COPY entrypoint.sh ./
+COPY prisma.config.ts ./
 COPY prisma ./prisma
 COPY dist ./dist
 COPY node_modules ./node_modules

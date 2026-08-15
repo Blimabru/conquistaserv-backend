@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY entrypoint.sh ./
 COPY prisma.config.ts ./
+COPY ecosystem.config.js ./
 COPY prisma ./prisma
 COPY dist ./dist
 COPY node_modules ./node_modules

@@ -20,6 +20,7 @@ model Usuario {
   deletedAt         DateTime?
   nivel             String
   situacao          String
+  onboardingConcluido Boolean           @default(false)
   secretariaId      String?
   secretaria        Secretaria?         @relation(fields: [secretariaId], references: [id])
   RequestLog        RequestLog[]

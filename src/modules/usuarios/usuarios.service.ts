@@ -85,6 +85,7 @@ export class UsuariosService {
         nivel: true,
         situacao: true,
         refreshToken: true,
+        onboardingConcluido: true,
       },
     });
   }
@@ -104,6 +105,13 @@ export class UsuariosService {
     }
 
     return usuario;
+  }
+
+  async marcaOnboardingConcluido(id: string): Promise<any> {
+    return this.prismaService.usuario.update({
+      where: { id },
+      data: { onboardingConcluido: true },
+    });
   }
 
   async atualiza(id: string, data: AtualizaUsuarioDto) {

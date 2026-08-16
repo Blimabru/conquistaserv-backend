@@ -1,8 +1,8 @@
-# ConquistaServ — Portal do Servidor Inteligente
+# Serv Conquista — Portal do Servidor Inteligente
 
 ## O que é
 
-O ConquistaServ é o Portal do Servidor Inteligente, uma plataforma digital desenvolvida para atender os servidores públicos municipais. O portal centraliza informações, serviços e orientações que antes estavam espalhados em diferentes setores e documentos físicos.
+O Serv Conquista é o Portal do Servidor Inteligente, uma plataforma digital desenvolvida para atender os servidores públicos municipais. O portal centraliza informações, serviços e orientações que antes estavam espalhados em diferentes setores e documentos físicos.
 
 ## Objetivo
 

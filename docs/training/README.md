@@ -14,8 +14,8 @@ Coloque aqui os arquivos que a IA usará como base de conhecimento.
 
 ```
 docs/training/
-├── 01-sobre-o-sistema.md       # O que é o ConquistaServ
-├── 02-direitos-beneficios.md   # Férias, licenças, progressão
+├── 01-sobre-o-sistema.md       # O que é o Serv Conquista
+├── 02-direitos-beneficios.md   # Leis, licenças, auxílios
 ├── 03-procedimentos.md         # Passo a passo de solicitações
 ├── 04-faq.md                   # Perguntas frequentes
 ├── legislacao.pdf              # PDFs de leis e normas

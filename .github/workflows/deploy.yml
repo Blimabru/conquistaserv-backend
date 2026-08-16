@@ -35,7 +35,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npx prisma generate
           npm run build
 

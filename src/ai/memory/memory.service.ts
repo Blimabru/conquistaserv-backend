@@ -46,13 +46,18 @@ export class MemoryService {
   formatHistoryForPrompt(sessionId: string): string {
     const history = this.getHistory(sessionId);
 
-    if (history.length === 0) {
+    const historyToFormat =
+      history.length > 0 && history[history.length - 1].role === 'user'
+        ? history.slice(0, -1)
+        : history;
+
+    if (historyToFormat.length === 0) {
       return '';
     }
 
-    const formatted = history
+    const formatted = historyToFormat
       .map((msg) => {
-        const role = msg.role === 'user' ? 'Servidor' : 'ConquistaServ';
+        const role = msg.role === 'user' ? 'Servidor' : 'Vitória';
         return `${role}: ${msg.content}`;
       })
       .join('\n');

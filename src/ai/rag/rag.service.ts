@@ -45,7 +45,7 @@ export class RagService {
   }
 
   private getDefaultPrompt(): string {
-    return `Você é o ConquistaServ, o assistente virtual do Portal do Servidor.
+    return `Você é o Serv Conquista, o assistente virtual do Portal do Servidor.
 Responda com base no contexto fornecido. Se não souber, diga que não possui a informação.
 {history}
 Contexto:
@@ -75,7 +75,9 @@ Resposta:`;
     }
 
     this.logger.log(
-      `Processando pergunta: "${question}"${sessionId ? ` [sessão: ${sessionId}]` : ''}`,
+      `Processando pergunta: "${question}"${
+        sessionId ? ` [sessão: ${sessionId}]` : ''
+      }`,
     );
 
     // Registra a mensagem do usuário no histórico
@@ -84,42 +86,69 @@ Resposta:`;
     }
 
     // --- Busca dados em tempo real do banco de dados (Contexto Dinâmico) ---
-    const [beneficios, documentos, servicos, canais, publicacoes] = await Promise.all([
-      this.prisma.beneficio.findMany({ where: { ativo: true, deletedAt: null } }),
-      this.prisma.documento.findMany({ where: { ativo: true, deletedAt: null } }),
-      this.prisma.servico.findMany({ where: { ativo: true, deletedAt: null } }),
-      this.prisma.canal.findMany({ where: { deletedAt: null } }),
-      this.prisma.publicacao.findMany({ where: { deletedAt: null }, orderBy: { dataPublicacao: 'desc' }, take: 10 }),
-    ]);
+    const [beneficios, documentos, servicos, canais, publicacoes] =
+      await Promise.all([
+        this.prisma.beneficio.findMany({
+          where: { ativo: true, deletedAt: null },
+        }),
+        this.prisma.documento.findMany({
+          where: { ativo: true, deletedAt: null },
+        }),
+        this.prisma.servico.findMany({
+          where: { ativo: true, deletedAt: null },
+        }),
+        this.prisma.canal.findMany({ where: { deletedAt: null } }),
+        this.prisma.publicacao.findMany({
+          where: { deletedAt: null },
+          orderBy: { dataPublicacao: 'desc' },
+          take: 10,
+        }),
+      ]);
 
     let dbContext = '';
 
     if (beneficios.length > 0) {
-      dbContext += `\\n### Benefícios Disponíveis:\\n` + beneficios.map(b => `- **${b.titulo}** (${b.categoria}): ${b.descricao}`).join('\\n');
+      dbContext +=
+        `\\n### Benefícios Disponíveis:\\n` +
+        beneficios
+          .map((b) => `- **${b.titulo}** (${b.categoria}): ${b.descricao}`)
+          .join('\\n');
     } else {
       dbContext += `\\n### Benefícios Disponíveis:\\nAtualmente não há benefícios cadastrados no sistema.\\n`;
     }
 
     if (documentos.length > 0) {
-      dbContext += `\\n### Documentos Disponíveis:\\n` + documentos.map(d => `- **${d.titulo}** (Versão: ${d.versao}): ${d.descricao}`).join('\\n');
+      dbContext +=
+        `\\n### Documentos Disponíveis:\\n` +
+        documentos
+          .map((d) => `- **${d.titulo}** (Versão: ${d.versao}): ${d.descricao}`)
+          .join('\\n');
     } else {
       dbContext += `\\n### Documentos Disponíveis:\\nAtualmente não há documentos cadastrados no sistema.\\n`;
     }
 
     if (servicos.length > 0) {
-      dbContext += `\\n### Serviços Oferecidos:\\n` + servicos.map(s => `- **${s.nome}**: ${s.descricao || 'Sem descrição'}`).join('\\n');
+      dbContext +=
+        `\\n### Serviços Oferecidos:\\n` +
+        servicos
+          .map((s) => `- **${s.nome}**: ${s.descricao || 'Sem descrição'}`)
+          .join('\\n');
     } else {
       dbContext += `\\n### Serviços Oferecidos:\\nAtualmente não há serviços cadastrados no sistema.\\n`;
     }
 
     if (canais.length > 0) {
-      dbContext += `\\n### Canais de Comunicação:\\n` + canais.map(c => `- **${c.nome}**: ${c.descricao}`).join('\\n');
+      dbContext +=
+        `\\n### Canais de Comunicação:\\n` +
+        canais.map((c) => `- **${c.nome}**: ${c.descricao}`).join('\\n');
     } else {
       dbContext += `\\n### Canais de Comunicação:\\nAtualmente não há canais cadastrados no sistema.\\n`;
     }
 
     if (publicacoes.length > 0) {
-      dbContext += `\\n### Últimas Publicações no Feed:\\n` + publicacoes.map(p => `- **${p.titulo}**: ${p.resumo}`).join('\\n');
+      dbContext +=
+        `\\n### Últimas Publicações no Feed:\\n` +
+        publicacoes.map((p) => `- **${p.titulo}**: ${p.resumo}`).join('\\n');
     } else {
       dbContext += `\\n### Últimas Publicações no Feed:\\nAtualmente não há publicações.\\n`;
     }
@@ -140,11 +169,11 @@ Resposta:`;
     const history = sessionId
       ? this.memoryService.formatHistoryForPrompt(sessionId)
       : '';
-      
+
     const templateWithHistory = rawTemplate
-      .replace('{history}', history)
-      .replace('{db_context}', dbContext)
-      .replace('{user_context}', userContext);
+      .replace(/{history}/g, history)
+      .replace(/{db_context}/g, dbContext)
+      .replace(/{user_context}/g, userContext);
 
     const prompt = ChatPromptTemplate.fromTemplate(templateWithHistory);
 

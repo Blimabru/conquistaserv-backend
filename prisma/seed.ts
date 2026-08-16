@@ -13,7 +13,12 @@ async function main() {
   }
 
   const pool = new Pool({ connectionString: databaseUrl });
-  const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
+  let schema = 'public';
+  try {
+    const url = new URL(databaseUrl);
+    schema = url.searchParams.get('schema') || 'public';
+  } catch (e) {}
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pool, { schema }) });
   try {
     const hash = '$2a$10$h9Nns51p.DuHiprLyGQSn.BPWh.rq2FO4Ksi1svmauZw0e485l2vi'; // 123456
 

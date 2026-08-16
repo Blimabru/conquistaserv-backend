@@ -161,7 +161,7 @@ Resposta:`;
       userContext += `[INFORMAÇÃO OCULTA DE SISTEMA: O nome do servidor com quem você está falando agora é "${context.userName}". Chame-o pelo nome se for uma saudação ou se fizer sentido.]\\n`;
     }
     if (context?.currentPage) {
-      userContext += `[INFORMAÇÃO OCULTA DE SISTEMA: O servidor está neste momento visualizando a tela "${context.currentPage}" do sistema. Se ele perguntar algo relacionado, leve isso em consideração.]\\n`;
+      userContext += `[INFORMAÇÃO OCULTA DE SISTEMA: O servidor está na tela "${context.currentPage}". Use essa informação discretamente para entender o contexto das perguntas dele, mas só mencione em qual tela ele está se for absolutamente necessário para a resposta.]\n`;
     }
 
     // Monta o prompt substituindo {history}, {db_context} e {user_context}

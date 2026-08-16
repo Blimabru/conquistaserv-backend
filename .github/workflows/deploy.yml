@@ -105,7 +105,7 @@ jobs:
                   - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
                   - REFRESH_TOKEN_EXPIRATION=604800s
                   - HTTP_PORT=3006
-                  - APP_HOSTNAME=conquistaserv.brainstormlabs.online
+                  - APP_HOSTNAME=servconquista.brainstormlabs.online
                   - APP_NAME=conquistaserv-backend
                 networks:
                   - global-network

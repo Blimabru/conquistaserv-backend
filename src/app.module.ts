@@ -1,4 +1,5 @@
 import { FeedbacksModule } from './modules/feedbacks/feedbacks.module';
+import { AiModule } from './ai/ai.module';
 import { PublicacoesModule } from './modules/publicacoes/publicacoes.module';
 import { SecretariasModule } from './modules/secretarias/secretarias.module';
 import { ServicosModule } from './modules/servicos/servicos.module';
@@ -37,6 +38,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     FeedbacksModule,
     DatabaseModule,
     SharedModule,
+    AiModule,
   ],
   providers: [
     {

@@ -103,7 +103,6 @@ jobs:
                 volumes:
                   - /etc/localtime:/etc/localtime:ro
                   - /etc/timezone:/etc/timezone:ro
-                  - /srv/stacks/conquistaserv/uploads:/app/uploads
                 environment:
                   - TZ=America/Bahia
                   - NODE_ENV=production

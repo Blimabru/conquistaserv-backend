@@ -12,13 +12,17 @@ import { extname, join } from 'path';
 import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { NivelMinimo } from 'src/common/decorators';
+import { TrainingService } from 'src/ai/training/training.service';
 
 @ApiBearerAuth()
 @NivelMinimo('ADMIN')
 @Controller('documentos/upload')
 @ApiTags('Documentos — Upload')
 export class DocumentosUploadController {
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly trainingService: TrainingService,
+  ) {}
 
   @Post()
   @ApiConsumes('multipart/form-data')
@@ -55,11 +59,17 @@ export class DocumentosUploadController {
     const hostname = this.config.get<string>('APP_HOSTNAME');
     const port = this.config.get<string>('HTTP_PORT');
     const baseUrl = `http${ssl ? 's' : ''}://${hostname}:${port}`;
-
-    return {
+    const result = {
       url: `${baseUrl}/uploads/documentos/${file.filename}`,
       tipo: extname(file.originalname).replace('.', '').toUpperCase(),
       tamanho: file.size,
     };
+
+    // Dispara a vetorização do RAG em background para aprender o documento enviado
+    this.trainingService
+      .reingest()
+      .catch((e) => console.error('Erro na vetorização automática', e));
+
+    return result;
   }
 }

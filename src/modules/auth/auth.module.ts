@@ -21,7 +21,7 @@ import { LocalAuthGuard } from 'src/common/guards';
         secret: configService.get<string>('ACCESS_TOKEN_SECRET'),
         signOptions: {
           expiresIn: configService.get<string>('ACCESS_TOKEN_EXPIRATION'),
-          algorithm: 'HS512', // Usando o algoritmo mais robusto HS512 para assinatura, fica a sua escolha o algoritmo
+          algorithm: 'HS512',
         },
       }),
       inject: [ConfigService],

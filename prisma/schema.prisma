@@ -191,14 +191,74 @@ model PesquisaResposta {
 }
 
 model Servico {
-  id        String     @id @default(uuid())
-  nome      String
-  descricao String?
-  createdAt DateTime   @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime   @updatedAt @db.Timestamptz(3)
-  feedbacks Feedback[]
+  id           String     @id @default(uuid())
+  nome         String
+  descricao    String?
+  icone        String?    @default("apps")
+  categoria    String?
+  urlAcao      String?
+  labelAcao    String?    @default("Acessar")
+  acessoRapido Boolean    @default(false)
+  ativo        Boolean    @default(true)
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime?
+  feedbacks    Feedback[]
 
   @@map("servicos")
+}
+
+model Beneficio {
+  id             String              @id @default(uuid())
+  titulo         String
+  descricao      String
+  descricaoLonga String?
+  icone          String
+  categoria      String
+  badge          String?
+  destaque       Boolean             @default(false)
+  ativo          Boolean             @default(true)
+  procedimentos  String[]
+  elegibilidade  String[]
+  locais         Json?
+  createdAt      DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime            @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?
+  downloads      BeneficioDownload[]
+
+  @@map("beneficios")
+}
+
+model BeneficioDownload {
+  id          String    @id @default(uuid())
+  beneficioId String
+  nome        String
+  url         String
+  tipo        String
+  tamanho     Int
+  ordem       Int       @default(0)
+  beneficio   Beneficio @relation(fields: [beneficioId], references: [id], onDelete: Cascade)
+
+  @@index([beneficioId])
+  @@map("beneficio_downloads")
+}
+
+model Documento {
+  id        String    @id @default(uuid())
+  titulo    String
+  versao    String    @default("v1.0")
+  descricao String
+  categoria String
+  corTag    String?
+  url       String
+  tipo      String?
+  tamanho   Int?
+  ativo     Boolean   @default(true)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime?
+
+  @@map("documentos")
 }
 
 model Feedback {
@@ -211,7 +271,7 @@ model Feedback {
   createdAt  DateTime @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 
-  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+  servico Servico @relation(fields: [servicoId], references: [id], onDelete: Cascade)
 
   @@index([servicoId])
   @@index([createdAt])

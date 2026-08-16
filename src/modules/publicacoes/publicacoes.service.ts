@@ -334,13 +334,11 @@ export class PublicacoesService {
 
     const { midias, pesquisa, ...pubData } = dados;
 
-    // Atualiza campos simples
     await this.prisma.publicacao.update({
       where: { id },
       data: pubData,
     });
 
-    // Recria mídias se enviadas
     if (midias !== undefined) {
       await this.prisma.midia.deleteMany({ where: { publicacaoId: id } });
       if (midias.length) {
@@ -350,7 +348,6 @@ export class PublicacoesService {
       }
     }
 
-    // Recria pesquisa se enviada
     if (pesquisa !== undefined) {
       await this.prisma.pesquisa.deleteMany({
         where: { publicacaoId: id },

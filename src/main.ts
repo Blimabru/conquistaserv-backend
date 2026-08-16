@@ -57,6 +57,8 @@ async function bootstrap() {
   // webpack, __dirname aponta pra dist/src, um diretório diferente.
   const uploadsDir = join(process.cwd(), 'uploads');
   mkdirSync(join(uploadsDir, 'comunicacao'), { recursive: true });
+  mkdirSync(join(uploadsDir, 'beneficios'), { recursive: true });
+  mkdirSync(join(uploadsDir, 'documentos'), { recursive: true });
   app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
 
   const swaggerConfig = new DocumentBuilder()
@@ -79,11 +81,9 @@ async function bootstrap() {
 
   if (ELASTICSEARCH_ACTIVE === 'true') {
     app.useLogger(
-      // Overwrite nestjs logger
       WinstonModule.createLogger({
         transports: ((): any[] => {
           const transports = [
-            // Winston
             new winston.transports.Console({
               level: 'debug',
               format: winston.format.combine(
@@ -94,7 +94,6 @@ async function bootstrap() {
                 ),
               ),
             }),
-            // Winston elasticsearch
             new winElasticsearch({
               indexPrefix: `logs-${APP_NAME}`,
               client: new Elasticsearch.Client({

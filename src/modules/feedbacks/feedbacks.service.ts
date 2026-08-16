@@ -18,7 +18,6 @@ export class FeedbacksService {
       whereClause.createdAt = { gte: this.getFiltroData(dias) };
     }
 
-    // Busca todos os feedbacks filtrados para calcular as métricas detalhadas
     const feedbacks = await this.prisma.feedback.findMany({
       where: whereClause,
       include: { servico: true }
@@ -49,7 +48,6 @@ export class FeedbacksService {
     const distribuicao = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     feedbacks.forEach(f => distribuicao[f.nota]++);
 
-    // Agrupamento por categorias
     const catMap = new Map();
     feedbacks.forEach(f => {
       if (f.categoria) {
@@ -60,7 +58,6 @@ export class FeedbacksService {
       .map(([nome, count]) => ({ nome, count }))
       .sort((a, b) => b.count - a.count);
 
-    // Agrupamento por serviços
     const servMap = new Map();
     feedbacks.forEach(f => {
       if (!servMap.has(f.servicoId)) {
@@ -75,9 +72,8 @@ export class FeedbacksService {
       nome: s.nome,
       total: s.total,
       media: parseFloat((s.soma / s.total).toFixed(1))
-    })).sort((a, b) => b.media - a.media); // Rank by media desc
+    })).sort((a, b) => b.media - a.media);
 
-    // Evolução diária (agrupando por dia: YYYY-MM-DD)
     const evoMap = new Map();
     feedbacks.forEach(f => {
       const dataStr = f.createdAt.toISOString().split('T')[0];

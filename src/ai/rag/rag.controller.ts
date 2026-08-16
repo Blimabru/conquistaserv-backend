@@ -23,12 +23,13 @@ export class RagController {
   async askQuestion(
     @Body('question') question: string,
     @Body('sessionId') sessionId?: string,
+    @Body('context') context?: any,
   ) {
     if (!question) {
       return { error: 'O campo "question" é obrigatório.' };
     }
 
-    const result = await this.ragService.askQuestion(question, sessionId);
+    const result = await this.ragService.askQuestion(question, sessionId, context);
     return { ...result, sessionId: sessionId || null };
   }
 

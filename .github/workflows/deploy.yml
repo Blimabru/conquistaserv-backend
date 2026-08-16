@@ -86,6 +86,13 @@ jobs:
             echo 'DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}' > .env
             echo 'ACCESS_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}' >> .env
             echo 'REFRESH_TOKEN_SECRET=${{ secrets.PROD_JWT_SECRET }}' >> .env
+            echo 'OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}' >> .env
+            echo 'AI_MODEL_NAME=gpt-4o-mini' >> .env
+            echo 'AI_TEMPERATURE=0' >> .env
+            echo 'AI_CHUNK_SIZE=1000' >> .env
+            echo 'AI_CHUNK_OVERLAP=200' >> .env
+            echo 'AI_DOCS_PATH=./docs/training' >> .env
+            echo 'AI_SYSTEM_PROMPT_PATH=./docs/prompts/system-prompt.md' >> .env
             
             echo 'name: conquistaserv
             services:
@@ -107,6 +114,13 @@ jobs:
                   - HTTP_PORT=3006
                   - APP_HOSTNAME=servconquista.brainstormlabs.online
                   - APP_NAME=conquistaserv-backend
+                  - OPENAI_API_KEY=${OPENAI_API_KEY}
+                  - AI_MODEL_NAME=${AI_MODEL_NAME}
+                  - AI_TEMPERATURE=${AI_TEMPERATURE}
+                  - AI_CHUNK_SIZE=${AI_CHUNK_SIZE}
+                  - AI_CHUNK_OVERLAP=${AI_CHUNK_OVERLAP}
+                  - AI_DOCS_PATH=${AI_DOCS_PATH}
+                  - AI_SYSTEM_PROMPT_PATH=${AI_SYSTEM_PROMPT_PATH}
                 networks:
                   - global-network
                 logging:

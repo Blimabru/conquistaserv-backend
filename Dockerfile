@@ -7,6 +7,7 @@ COPY entrypoint.sh ./
 COPY prisma.config.ts ./
 COPY ecosystem.config.js ./
 COPY prisma ./prisma
+COPY docs ./docs
 COPY dist ./dist
 COPY node_modules ./node_modules
 

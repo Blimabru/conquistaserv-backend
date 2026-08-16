@@ -59,7 +59,7 @@ async function bootstrap() {
   mkdirSync(join(uploadsDir, 'comunicacao'), { recursive: true });
   mkdirSync(join(uploadsDir, 'beneficios'), { recursive: true });
   mkdirSync(join(uploadsDir, 'documentos'), { recursive: true });
-  app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
+  app.useStaticAssets(uploadsDir, { prefix: '/api/uploads' });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Modelo Back-End')

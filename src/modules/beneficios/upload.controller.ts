@@ -51,10 +51,13 @@ export class BeneficiosUploadController {
     }),
   )
   async upload(@UploadedFile() file: Express.Multer.File) {
-    const ssl = process.env.SSL === 'true';
+    const isProd = process.env.NODE_ENV === 'production';
+    const ssl = process.env.SSL === 'true' || isProd;
     const hostname = this.config.get<string>('APP_HOSTNAME');
     const port = this.config.get<string>('HTTP_PORT');
-    const baseUrl = `http${ssl ? 's' : ''}://${hostname}:${port}`;
+    const baseUrl = isProd
+      ? `https://${hostname}/api`
+      : `http${ssl ? 's' : ''}://${hostname}:${port}/api`;
 
     return {
       url: `${baseUrl}/uploads/beneficios/${file.filename}`,

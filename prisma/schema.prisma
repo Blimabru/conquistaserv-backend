@@ -1,10 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
-  moduleFormat = "cjs"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+  moduleFormat  = "cjs"
 }
 
 datasource db {
@@ -12,41 +9,211 @@ datasource db {
 }
 
 model Usuario {
-  id           String       @id @default(uuid())
-  nome         String
-  email        String       @unique
-  nivel        String
-  situacao     String
-  login        String       @unique
-  senha        String
-  refreshToken String?
-  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
-  deletedAt    DateTime?
-  RequestLog   RequestLog[]
+  id                String              @id @default(uuid())
+  nome              String
+  email             String              @unique
+  login             String              @unique
+  senha             String
+  refreshToken      String?
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime            @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?
+  nivel             String
+  situacao          String
+  secretariaId      String?
+  secretaria        Secretaria?         @relation(fields: [secretariaId], references: [id])
+  RequestLog        RequestLog[]
+  canaisMembro      CanalMembro[]
+  respostasPesquisa PesquisaResposta[]
+  leituras          PublicacaoLeitura[]
+  reacoes           PublicacaoReacao[]
+  publicacoesAutor  Publicacao[]
 
-  @@map("usuarios") 
+  @@map("usuarios")
 }
 
 model RequestLog {
-  id        String   @id @default(uuid())
-  timestamp DateTime @default(now()) @db.Timestamptz(3)
-
-  userId    String?
-  user      Usuario? @relation(fields: [userId], references: [id])
-  ipAddress String?
-
-  method     String
-  path       String
-  statusCode Int
-  latency    Int
-  body       Json?  @db.JsonB
-
+  id          String   @id @default(uuid())
+  timestamp   DateTime @default(now()) @db.Timestamptz(3)
+  userId      String?
+  ipAddress   String?
+  method      String
+  path        String
+  statusCode  Int
+  latency     Int
+  body        Json?
   serviceName String?
   actionName  String?
   userAgent   String?
+  user        Usuario? @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([timestamp])
   @@index([path])
+}
+
+model Canal {
+  id           String        @id @default(uuid())
+  nome         String
+  descricao    String
+  tipo         String        @default("PUBLICO")
+  oficial      Boolean       @default(false)
+  cor          String
+  icone        String
+  secretariaId String?       @unique
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime?
+  secretaria   Secretaria?   @relation(fields: [secretariaId], references: [id])
+  membros      CanalMembro[]
+  publicacoes  Publicacao[]
+
+  @@map("canais")
+}
+
+model Secretaria {
+  id        String    @id @default(uuid())
+  nome      String
+  descricao String
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime?
+  canal     Canal?
+  usuarios  Usuario[]
+
+  @@map("secretarias")
+}
+
+model CanalMembro {
+  id                 String   @id @default(uuid())
+  canalId            String
+  usuarioId          String
+  notificacoesAtivas Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  canal              Canal    @relation(fields: [canalId], references: [id], onDelete: Cascade)
+  usuario            Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([canalId, usuarioId])
+  @@index([usuarioId])
+  @@map("canal_membros")
+}
+
+model Publicacao {
+  id                 String              @id @default(uuid())
+  canalId            String
+  titulo             String
+  resumo             String
+  corpo              String
+  autorId            String?
+  dataPublicacao     DateTime            @default(now()) @db.Timestamptz(3)
+  prioridade         Int                 @default(0)
+  reacoesHabilitadas Boolean             @default(true)
+  privada            Boolean             @default(false)
+  createdAt          DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime?
+  pesquisa           Pesquisa?
+  leituras           PublicacaoLeitura[]
+  midias             Midia[]
+  reacoes            PublicacaoReacao[]
+  autor              Usuario?            @relation(fields: [autorId], references: [id])
+  canal              Canal               @relation(fields: [canalId], references: [id], onDelete: Cascade)
+
+  @@index([canalId])
+  @@index([dataPublicacao])
+  @@map("publicacoes")
+}
+
+model Midia {
+  id           String     @id @default(uuid())
+  publicacaoId String
+  tipo         String
+  url          String
+  poster       String?
+  ordem        Int        @default(0)
+  publicacao   Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+
+  @@index([publicacaoId])
+  @@map("publicacao_midias")
+}
+
+model PublicacaoReacao {
+  id           String     @id @default(uuid())
+  publicacaoId String
+  usuarioId    String
+  tipo         String
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  publicacao   Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([publicacaoId, usuarioId])
+  @@index([publicacaoId])
+  @@map("publicacao_reacoes")
+}
+
+model PublicacaoLeitura {
+  id           String     @id @default(uuid())
+  publicacaoId String
+  usuarioId    String
+  lidoEm       DateTime   @default(now()) @db.Timestamptz(3)
+  publicacao   Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([publicacaoId, usuarioId])
+  @@index([usuarioId])
+  @@map("publicacao_leituras")
+}
+
+model Pesquisa {
+  id                String             @id @default(uuid())
+  publicacaoId      String             @unique
+  pergunta          String
+  escala            Int                @default(5)
+  permiteComentario Boolean            @default(true)
+  respostas         PesquisaResposta[]
+  publicacao        Publicacao         @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+
+  @@map("pesquisas")
+}
+
+model PesquisaResposta {
+  id         String   @id @default(uuid())
+  pesquisaId String
+  usuarioId  String
+  nota       Int
+  comentario String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  pesquisa   Pesquisa @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([pesquisaId, usuarioId])
+  @@map("pesquisa_respostas")
+}
+
+model Servico {
+  id        String     @id @default(uuid())
+  nome      String
+  descricao String?
+  createdAt DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime   @updatedAt @db.Timestamptz(3)
+  feedbacks Feedback[]
+
+  @@map("servicos")
+}
+
+model Feedback {
+  id         String   @id @default(uuid())
+  servicoId  String
+  nota       Int
+  comentario String?
+  categoria  String?
+  status     String   @default("PENDENTE")
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+
+  @@index([servicoId])
+  @@index([createdAt])
+  @@map("feedbacks")
 }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsIn, IsOptional } from 'class-validator';
 import { NIVEIS_VALIDOS, NivelAcesso } from 'src/common/constants';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -32,4 +32,12 @@ export class CriaUsuarioDto {
   @IsNotEmpty({ message: 'Faltou informar a senha do usuário' })
   @ApiProperty()
   senha: string;
+
+  @IsOptional()
+  @IsString({ message: 'A secretaria deve ser uma String' })
+  @ApiProperty({
+    required: false,
+    description: 'Obrigatório para usuários de nível USUARIO; ADMIN não tem secretaria.',
+  })
+  readonly secretariaId?: string;
 }

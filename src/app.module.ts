@@ -1,3 +1,7 @@
+import { FeedbacksModule } from './modules/feedbacks/feedbacks.module';
+import { PublicacoesModule } from './modules/publicacoes/publicacoes.module';
+import { SecretariasModule } from './modules/secretarias/secretarias.module';
+import { CanaisModule } from './modules/canais/canais.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { DatabaseModule } from './plugins/database/database.module';
@@ -21,6 +25,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     AuthModule,
     UsuariosModule,
     AnalyticsModule,
+    CanaisModule,
+    PublicacoesModule,
+    SecretariasModule,
+    FeedbacksModule,
     DatabaseModule,
     SharedModule,
   ],

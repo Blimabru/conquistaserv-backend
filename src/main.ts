@@ -6,7 +6,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { readFileSync } from 'fs';
+import { readFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 import { LoggingInterceptor } from './common/interceptors';
 import * as winElasticsearch from 'winston-elasticsearch';
@@ -49,6 +50,14 @@ async function bootstrap() {
   const config = app.get(ConfigService);
 
   app.setGlobalPrefix('api');
+
+  // Servir uploads como arquivos estáticos (fora do prefixo /api).
+  // process.cwd() (não __dirname) porque é onde o Multer também salva
+  // (diskStorage usa caminho relativo './uploads/...') — em dev sem
+  // webpack, __dirname aponta pra dist/src, um diretório diferente.
+  const uploadsDir = join(process.cwd(), 'uploads');
+  mkdirSync(join(uploadsDir, 'comunicacao'), { recursive: true });
+  app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Modelo Back-End')

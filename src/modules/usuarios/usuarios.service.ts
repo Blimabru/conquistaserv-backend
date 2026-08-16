@@ -2,6 +2,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   ConflictException,
+  BadRequestException,
   Injectable,
 } from '@nestjs/common';
 import { PrismaService } from '../../plugins/database/services/prisma.service';
@@ -19,6 +20,8 @@ export class UsuariosService {
   ) {}
 
   async cria(data: CriaUsuarioDto): Promise<any> {
+    this._validaSecretaria(data.nivel, data.secretariaId);
+
     data.senha = await this.hashDado(data.senha);
 
     await this._emailExiste(data);
@@ -43,9 +46,13 @@ export class UsuariosService {
 
       if (filtro && valor) {
         filtro.forEach((filtro, index) => {
-          querys[filtro] = {
-            equals: valor[index],
-          };
+          // Filtro/valor vazio (ex: "filtro=nivel,situacao&valor=,") significa
+          // "sem filtro" — aplicar equals('') faria a busca nunca bater com nada.
+          if (valor[index]) {
+            querys[filtro] = {
+              equals: valor[index],
+            };
+          }
         });
       }
 
@@ -87,6 +94,9 @@ export class UsuariosService {
       where: {
         id,
       },
+      include: {
+        secretaria: { select: { id: true, nome: true } },
+      },
     });
 
     if (!usuario) {
@@ -106,6 +116,13 @@ export class UsuariosService {
     if (!usuarioExists) {
       throw new NotFoundException('Usuario não existe');
     }
+
+    this._validaSecretaria(
+      data.nivel ?? usuarioExists.nivel,
+      data.secretariaId !== undefined
+        ? data.secretariaId
+        : usuarioExists.secretariaId,
+    );
 
     if (data.email && usuarioExists.email !== data.email) {
       await this._emailExiste(data);
@@ -152,6 +169,14 @@ export class UsuariosService {
 
   async comparaDados(rawData: string, hash: string) {
     return bcrypt.compareSync(rawData, hash);
+  }
+
+  private _validaSecretaria(nivel: string, secretariaId?: string | null) {
+    if (nivel === 'USUARIO' && !secretariaId) {
+      throw new BadRequestException(
+        'Usuário precisa estar vinculado a uma secretaria.',
+      );
+    }
   }
 
   private async _usuarioExiste(

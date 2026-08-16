@@ -5,9 +5,15 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient {
   constructor() {
-    const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL as string,
-    });
+    const connectionString = process.env.DATABASE_URL as string;
+    let schema = 'public';
+    try {
+      const url = new URL(connectionString);
+      schema = url.searchParams.get('schema') || 'public';
+    } catch (e) {
+      // fallback
+    }
+    const adapter = new PrismaPg({ connectionString }, { schema });
     super({ adapter });
   }
 }

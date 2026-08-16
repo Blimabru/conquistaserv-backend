@@ -5,5 +5,6 @@ export type Usuario = {
   nivel: string;
   situacao: string;
   senha: string;
+  onboardingConcluido: boolean;
   refreshToken?: string;
 };

@@ -61,6 +61,17 @@ export class UsuariosController {
     return this.usuarioService.buscaPorId(req.user.sub);
   }
 
+  @Patch('/me/onboarding')
+  @NivelMinimo('USUARIO')
+  @ApiUpdateOperation({
+    summary: 'Conclui o onboarding do usuário autenticado',
+    description:
+      'Marca o tour de onboarding como concluído para o usuário dono do token de acesso informado, sem exigir nível de administrador...',
+  })
+  async concluiOnboarding(@Request() req: AccessTokenRequest): Promise<any> {
+    return this.usuarioService.marcaOnboardingConcluido(req.user.sub);
+  }
+
   @Get('/:id')
   @ApiSearchOperation({
     summary: 'Busca um usuário',
